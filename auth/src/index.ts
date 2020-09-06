@@ -1,4 +1,5 @@
 import express from "express";
+import "express-async-errors";// to use throw in async functions 
 
 //route handlers
 import { currentUserRouter } from "./routes/current-user";
@@ -24,7 +25,7 @@ app.use("/api/users/signin", signInRouter);
 app.use("/api/users/signout", signOutRouter);
 
 // if route does not exist
-app.get("*", () => {
+app.all("*", async () => {
   throw new NotFoundError();
 
 })
