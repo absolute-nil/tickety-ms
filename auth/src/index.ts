@@ -1,6 +1,7 @@
 import express from "express";
 import "express-async-errors";// to use throw in async functions 
 import mongoose from "mongoose";
+import cookieSession from 'cookie-session'
 
 //route handlers
 import { currentUserRouter } from "./routes/current-user";
@@ -16,8 +17,13 @@ import { errorHandler } from "./middlewares/error-handler";
 
 
 const app = express();
+app.set('trust proxy', true)
 
 app.use(express.json());
+app.use(cookieSession({
+  signed: false,
+  secure: true
+}))
 
 //routes
 app.use("/api/users/currentuser", currentUserRouter);
