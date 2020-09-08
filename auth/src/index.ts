@@ -1,5 +1,6 @@
 import express from "express";
 import "express-async-errors";// to use throw in async functions 
+import mongoose from "mongoose";
 
 //route handlers
 import { currentUserRouter } from "./routes/current-user";
@@ -33,6 +34,21 @@ app.all("*", async () => {
 // middleware
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log("auth service running on port 3000");
-})
+const start = async () => {
+  try {
+    await mongoose.connect("mongodb://auth-mongo-srv:27017/auth", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    })
+    console.log("connected to mongodb")
+  } catch (e) {
+    console.error(e);
+  }
+  app.listen(3000, () => {
+    console.log("auth service running on port 3000");
+  })
+}
+
+start();
+
