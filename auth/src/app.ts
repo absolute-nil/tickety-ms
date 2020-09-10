@@ -21,14 +21,14 @@ app.set('trust proxy', true)
 app.use(express.json());
 app.use(cookieSession({
   signed: false,
-  secure: true
+  secure: process.env.NODE_ENV !== "test"
 }))
 
 //routes
 app.use("/api/users/currentuser", currentUserRouter);
-app.use("/api/users/signup", signUpRouter);
 app.use("/api/users/signin", signInRouter);
 app.use("/api/users/signout", signOutRouter);
+app.use("/api/users/signup", signUpRouter);
 
 // if route does not exist
 app.all("*", async () => {
