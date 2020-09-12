@@ -9,10 +9,10 @@ import { signUpRouter } from "./routes/sign-up";
 import { signOutRouter } from "./routes/sign-out";
 
 // error
-import { NotFoundError } from "./errors/not-found-error";
+import { NotFoundError } from "@n19tickety/common";
 
 //middleware
-import { errorHandler } from "./middlewares/error-handler";
+import { errorHandler } from "@n19tickety/common";
 
 
 const app = express();
