@@ -1,5 +1,6 @@
 import { Stan } from "node-nats-streaming";
 import { Subjects } from "./subjects";
+import { rejects } from "assert";
 
 interface Event {
   subject: Subjects;
@@ -14,13 +15,21 @@ export abstract class Publisher<T extends Event> {
     this.client = client;
   }
 
-  publish(data: T['data']) {
-    this.client.publish(
-      this.subject,
-      JSON.stringify(data),
-      () => {
-        console.log('Event Published')
-      }
-    )
+  publish(data: T['data']): Promise<void> {
+
+    return new Promise((resolve, reject) => {
+      this.client.publish(
+        this.subject,
+        JSON.stringify(data),
+        (err) => {
+          if (err) {
+            return reject(err);
+          }
+          console.log(`event published to subject: ${this.subject}`);
+          resolve()
+        }
+      )
+    })
+
   }
 }
