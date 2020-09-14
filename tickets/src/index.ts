@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import { app } from './app'
+import { natsWrapper } from "./nats-wrapper";
 const start = async () => {
   if (!process.env.JWT_KEY) {
     throw new Error("JWT_KEY must be defined");
@@ -11,6 +12,18 @@ const start = async () => {
 
   }
   try {
+    await natsWrapper.connect('tickety', 'rgferf', 'http://nats-srv:4222')
+    natsWrapper.client.on('close', () => {
+      // to immediately tell nats to close the connection when it goes offline (so that there is no delay in events)
+      console.log('NATS connection closed');
+      process.exit()
+    })
+    // for nodemon SIGUSR2
+    // this executes stan.close just after we hit ctrl + c or rs and then closes the window
+    process.on('SIGINT', () => natsWrapper.client.close())
+    process.on('SIGTERM', () => natsWrapper.client.close())
+    // process.on('SIGUSR2', () => natsWrapper.client.close())
+
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
