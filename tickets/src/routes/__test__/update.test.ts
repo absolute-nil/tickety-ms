@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 
 import { app } from "../../app";
 import { Ticket } from "../../models/ticket";
-
+// it might look as if we are calling the real nats wrapper but the jest.mock will redirect this req
+// to the fake nats wrapper
+import { natsWrapper } from "../../nats-wrapper";
 it('returns a 404 if the provider id does not exist', async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
   await request(app)
@@ -126,5 +128,32 @@ it('updates the ticket if valid inputs are provided', async () => {
 
   expect(updatedResponse.body.title).toEqual(updatedTitle);
   expect(updatedResponse.body.price).toEqual(updatedPrice);
+
+})
+
+it('publishes an event', async () => {
+  const title = 'title';
+  const price = 10;
+  const updatedTitle = 'ourfbved';
+  const updatedPrice = 8309;
+  const cookie = global.signin();
+  const response = await request(app)
+    .post("/api/tickets")
+    .set('Cookie', cookie)
+    .send({
+      title,
+      price
+    })
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: updatedTitle,
+      price: updatedPrice
+    })
+    .expect(200)
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+
 
 })
