@@ -1,15 +1,17 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface TickerAttrs {
-  title: string,
-  price: number,
-  userId: string
+  title: string;
+  price: number;
+  userId: string;
 }
 
 interface TicketDoc extends mongoose.Document {
-  title: string,
-  price: number,
-  userId: string
+  title: string;
+  price: number;
+  userId: string;
+  version: number;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -38,6 +40,10 @@ const ticketSchema = new mongoose.Schema({
     }
   }
 })
+
+// for concurrency control
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (attrs: TickerAttrs) => {
   return new Ticket(attrs);
