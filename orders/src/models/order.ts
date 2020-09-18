@@ -3,17 +3,19 @@ import { OrderStatus } from "@n19tickety/common"
 
 import { TicketDoc } from "./ticket";
 
+// we do this so that other files in orders service needing this know that it is an order model implementation
+export { OrderStatus };
 interface OrderAttrs {
   userId: string;
   status: OrderStatus;
-  expiresAt: string;
+  expiresAt: Date;
   ticket: TicketDoc;
 }
 
 interface OrderDoc extends mongoose.Document {
   userId: string;
   status: OrderStatus;
-  expiresAt: string;
+  expiresAt: Date;
   ticket: TicketDoc;
 }
 
