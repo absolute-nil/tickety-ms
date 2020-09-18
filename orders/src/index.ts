@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
 import { app } from './app'
+import { TicketCreatedListener } from "./events/listeners/ticket-created-listener";
+import { TicketUpdatedListner } from "./events/listeners/ticket-updated-listener";
 import { natsWrapper } from "./nats-wrapper";
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -22,6 +24,10 @@ const start = async () => {
   if (!process.env.NATS_URL) {
     throw new Error("NATS_URL must be defined");
   }
+
+  if (!process.env.MAX_RETIRES) {
+    throw new Error("MAX_RETIRES must be defined");
+  }
   try {
     await natsWrapper.connect(process.env.NATS_CLUSTER_ID, process.env.NATS_CLIENT_ID, process.env.NATS_URL)
     natsWrapper.client.on('close', () => {
@@ -35,6 +41,9 @@ const start = async () => {
     process.on('SIGTERM', () => natsWrapper.client.close())
     // process.on('SIGUSR2', () => natsWrapper.client.close())
 
+    // initialize listeners
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListner(natsWrapper.client).listen();
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -45,7 +54,7 @@ const start = async () => {
     console.error(e);
   }
   app.listen(3000, () => {
-    console.log("tickets service running on port 3000");
+    console.log("orders service running on port 3000");
   })
 }
 
