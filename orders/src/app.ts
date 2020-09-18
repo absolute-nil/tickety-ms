@@ -24,10 +24,10 @@ app.use(cookieSession({
 app.use(currentUser);
 
 //routes
-app.use('/api/orders/:orderId', deleteOrderRouter);
+app.use('/api/orders', deleteOrderRouter);
 app.use('/api/orders', indexOrderRouter)
 app.use('/api/orders', newOrderRouter)
-app.use('/api/orders/:orderId', showOrderRouter)
+app.use('/api/orders', showOrderRouter)
 
 // if route does not exist
 app.all("*", async () => {
