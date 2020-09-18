@@ -59,6 +59,7 @@ router.post("/", requireAuth, [
 
   new OrderCreatedPublisher(natsWrapper.client).publish({
     id: order.id,
+    version: order.version,
     status: order.status,
     userId: order.userId,
     // convert to iso so that regardless of timezone it works (UTC time zone)
