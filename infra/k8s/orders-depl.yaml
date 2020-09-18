@@ -16,6 +16,8 @@ spec:
         - name: orders
           image: nikhilsksharma/orders
           env:
+            - name: MAX_RETIRES
+              value: "10"
             - name: NATS_CLIENT_ID
               valueFrom:
                 fieldRef:
