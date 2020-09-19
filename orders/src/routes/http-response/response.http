@@ -1,0 +1,21 @@
+POST https://tickety.com/api/users/signup
+Content-Type: application/json
+
+{
+  "email": "test@2.com",
+  "password": "test@1.com"
+}
+
+###
+
+POST https://tickety.com/api/users/signin 
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+
+{
+  "email": "test@2.com",
+  "password": "test@1.com"
+}
+
+###
+GET https://tickety.com/api/users/currentUser
