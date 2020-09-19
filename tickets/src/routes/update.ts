@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { requireAuth, validateRequest, NotFoundError, NotAuthorizedError } from "@n19tickety/common";
+import { requireAuth, validateRequest, NotFoundError, NotAuthorizedError, BadRequestError } from "@n19tickety/common";
 
 import { Ticket } from "../models/ticket";
 import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher";
@@ -23,6 +23,11 @@ router.put('/:id', requireAuth, [
 
   if (ticket.userId !== req.currentUser!.id) {
     throw new NotAuthorizedError();
+  }
+
+  // will throw error if order has been made
+  if (ticket.orderId) {
+    throw new BadRequestError("Cannot edit a reserved ticket");
   }
 
   ticket.set({
