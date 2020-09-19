@@ -8,8 +8,9 @@ const router = express.Router();
 // @url: /api/orders/:orderId
 // method: GET
 // returns an order
-router.get("/", requireAuth, async (req: Request, res: Response) => {
+router.get("/:orderId", requireAuth, async (req: Request, res: Response) => {
   const orderId = req.params.orderId;
+  console.log(orderId)
   const order = await Order.findById(orderId).populate('ticket');
 
   if (!order) {
