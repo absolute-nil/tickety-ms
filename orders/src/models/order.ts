@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { OrderStatus } from "@n19tickety/common"
 
 import { TicketDoc } from "./ticket";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 // we do this so that other files in orders service needing this know that it is an order model implementation
 export { OrderStatus };
@@ -52,7 +53,18 @@ const orderSchema = new mongoose.Schema({
   }
 });
 
-
+// for version control (concurrency)
+orderSchema.set('versionKey', 'version');
+// ! dont use this during production
+orderSchema.plugin(updateIfCurrentPlugin);
+// !use this instead
+// orderSchema.pre('save', function (done) {
+//   // @ts-ignore
+//   this.$where = {
+//     version: this.get('version') - 1
+//   };
+//   done();
+// })
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs);
 }
