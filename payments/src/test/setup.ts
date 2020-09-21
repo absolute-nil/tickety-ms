@@ -17,6 +17,10 @@ declare global {
 // mock the nats wrapper (whereever nats-wrapper.ts will be imported it will redirect to the fake file in mocks)
 jest.mock('../nats-wrapper.ts')
 
+// to access the dot env files during test in local environment
+import dotenv from 'dotenv';
+dotenv.config({ path: 'YOUR FULL PATH TO THE DOT ENV FILE' });
+
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 let mongo: any;
 beforeAll(async () => {
