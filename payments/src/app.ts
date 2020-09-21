@@ -4,9 +4,7 @@ import cookieSession from 'cookie-session'
 
 // error middleware
 import { NotFoundError, errorHandler, currentUser } from "@n19tickety/common";
-
-
-
+import { createChargeRouter } from "./routes/new";
 
 const app = express();
 app.set('trust proxy', true)
@@ -21,7 +19,7 @@ app.use(cookieSession({
 app.use(currentUser);
 
 //routes
-
+app.use('/api/payments', createChargeRouter)
 
 // if route does not exist
 app.all("*", async () => {
