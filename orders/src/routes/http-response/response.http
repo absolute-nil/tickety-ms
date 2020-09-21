@@ -19,3 +19,25 @@ Accept-Encoding: gzip, deflate, br
 
 ###
 GET https://tickety.com/api/users/currentUser
+
+###
+
+# @name ticket
+POST https://tickety.com/api/tickets 
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+
+{
+  "title": "concert",
+  "price": 10
+}
+
+###
+
+POST https://tickety.com/api/orders 
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+
+{
+  "ticketId": "{{ticket.response.body.id}}"
+}
