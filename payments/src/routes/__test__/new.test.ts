@@ -5,8 +5,13 @@ import { app } from '../../app';
 import { Order } from '../../models/order';
 import { OrderStatus } from '@n19tickety/common';
 import { stripe } from '../../stripe';
+import { Payment } from '../../models/payment';
 
-jest.mock('../../stripe');
+
+// ! the mock is unit test and testing the real stripe api call is integration test
+// ! the mock isnt a realistic test but can be used
+// !either use mock implementation or directly reach to stripe
+//jest.mock('../../stripe');
 
 it('returns an 404 when purchasing an order that does not exist', async () => {
 
@@ -65,7 +70,7 @@ it('returns an 400 when purchasing a cancelled order', async () => {
 
 it('returns a 201 with valid inputs', async () => {
   const user = mongoose.Types.ObjectId().toHexString();
-  const price = 10;
+  const price = Math.floor(Math.random() * 100000);
   const currency = 'inr';
   //* tok_visa is for testing (provided by stripe)
   const source = 'tok_visa';
@@ -86,9 +91,38 @@ it('returns a 201 with valid inputs', async () => {
       orderId: order.id
     })
     .expect(201);
+  // * integration test
+  const stripeCharges = await stripe.charges.list({ limit: 50 });
 
-  const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
-  expect(chargeOptions.source).toEqual(source);
-  expect(chargeOptions.amount).toEqual(price * 100);
-  expect(chargeOptions.currency).toEqual(currency);
+  const stripeCharge = stripeCharges.data.find(charge => {
+    return charge.amount === price * 100
+  });
+
+  expect(stripeCharge).toBeDefined()
+  expect(stripeCharge!.currency).toEqual(currency);
+
+  const payment = await Payment.findOne({
+    orderId: order.id,
+    stripeId: stripeCharge!.id
+  })
+
+  //! find one returns null so toBeDefined will always return true
+  // therefore use not toBeNull instead
+  expect(payment).not.toBeNull();
+
+  // ! below are things you would test with mock function
+  // const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
+  // const chargeResult = await (stripe.charges.create as jest.Mock).mock.results[0].value;
+  // expect(chargeOptions.source).toEqual(source);
+  // expect(chargeOptions.amount).toEqual(price * 100);
+  // expect(chargeOptions.currency).toEqual(currency);
+  // const payment = await Payment.findOne({
+  //   orderId: order.id,
+  //   stripeId: chargeResult.id,
+  // });
+
+  // expect(payment).toBeDefined();
+  // expect(payment!.orderId).toEqual(order.id);
+  // expect(payment!.stripeId).toEqual(chargeResult.id);
+
 });
