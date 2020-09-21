@@ -6,3 +6,4 @@ dist
 config
 common
 notes
+*.env.*
