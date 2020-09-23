@@ -9,7 +9,9 @@ const buildClient = ({ req }) => {
 
     return axios.create({
       baseURL:
-        'http://ingress-nginx-controller.ingress-nginx.svc.cluster.local',
+        // * for dev use the commented
+        // 'http://ingress-nginx-controller.ingress-nginx.svc.cluster.local'
+        'http://www.nikhil-tickety-app.xyz',
       // need to specify the host as there may be many different rules related to different domains in ingress
       // req.headers includes cookies Host and other things relevant to make request
       headers: req.headers,
